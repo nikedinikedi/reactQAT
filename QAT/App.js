@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -8,15 +8,30 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [name, setName] = useState('');
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('@MySuperStore:questions');
+        if (value !== null) {
+          setQuestions(JSON.parse(value));
+        }
+      } catch (error) {
+        console.log('Error retrieving data:', error);
+      }
+    };
+
+    getData();
+  }, []);
 
   const saveData = async () => {
     try {
-      await AsyncStorage.setItem('@MySuperStore:name', name);
+      const newQuestions = [...questions, name];
+      await AsyncStorage.setItem('@MySuperStore:questions', JSON.stringify(newQuestions));
       console.log('Data saved successfully');
-      // log the data
-      const value = await AsyncStorage.getItem('@MySuperStore:name');
-      console.log('Value:', value);
-      
+      setQuestions(newQuestions);
+      setName('');
     } catch (error) {
       console.log('Error saving data:', error);
     }
@@ -37,11 +52,7 @@ export default function App() {
                 />
                 <Button
                   title="Submit"
-                  onPress={() => {
-                    saveData();
-                    // clear the input field
-                    setName('');
-                  }}
+                  onPress={saveData}
                 />
               </View>
             </View>
@@ -50,9 +61,9 @@ export default function App() {
         <Tab.Screen name="Questions" options={{ title: 'Questions' }}>
           {() => (
             <View style={styles.container}>
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Button title="Questions Screen" onPress={() => console.log('Questions button pressed')} />
-              </View>
+              {questions.map((question, index) => (
+                <Text key={index}>{question}</Text>
+              ))}
             </View>
           )}
         </Tab.Screen>
