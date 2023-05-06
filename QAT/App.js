@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
+import ProjectScreen from './screens/ProjectScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -62,6 +63,8 @@ export default function App() {
       {/* stack navigation */}
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
+        {/* stack screen projectscreen */}
+        <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
       </Stack.Navigator>
 
     </NavigationContainer>
